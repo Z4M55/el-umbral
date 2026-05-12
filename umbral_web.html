@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Umbral</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Space+Mono:wght@400&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body { background: #0c0906; }
+
+  #proto {
+    background: #0c0906;
+    color: #e4d8c8;
+    font-family: 'EB Garamond', Georgia, serif;
+    min-height: 700px;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .screen {
+    display: none;
+    position: absolute;
+    inset: 0;
+    min-height: 700px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 2rem;
+    animation: fadeIn 0.6s ease;
+    z-index: 1;
+  }
+  .screen.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0);   }
+  }
+
+  .tex {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse at 30% 40%, rgba(180,100,40,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 70% 60%, rgba(100,70,40,0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAV */
+  .nav-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+  }
+  .nav-logo {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #5a4a3a;
+  }
+  .nav-progress {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: #5a4a3a;
+  }
+  .nav-progress span { color: #c07a45; }
+
+  /* ===== S0 ENTRADA ===== */
+  .s0-phrase {
+    font-size: clamp(1.3rem, 4vw, 1.9rem);
+    font-style: italic;
+    font-weight: 400;
+    text-align: center;
+    line-height: 1.55;
+    color: #e4d8c8;
+    max-width: 480px;
+    margin-bottom: 3rem;
+  }
+  .s0-phrase em { color: #c07a45; font-style: normal; }
+
+  .btn-enter {
+    background: none;
+    border: 0.5px solid #3a2e22;
+    color: #8a7a6a;
+    padding: 0.7rem 2rem;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: lowercase;
+  }
+  .btn-enter:hover { border-color: #c07a45; color: #e4d8c8; }
+
+  /* ===== S1 PROYECTO ===== */
+  #s1 { justify-content: flex-start; padding-top: 5rem; overflow-y: auto; }
+  .s1-block { max-width: 480px; width: 100%; margin-bottom: 2rem; }
+  .s1-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: #c07a45;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+  }
+  .s1-title {
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: #e4d8c8;
+    margin-bottom: 0.6rem;
+    line-height: 1.3;
+  }
+  .s1-body { font-size: 0.92rem; color: #8a7a6a; line-height: 1.7; }
+  .s1-divider { width: 1px; height: 2rem; background: #2a2218; margin: 0 0 2rem 0; }
+
+  .btn-next {
+    background: none;
+    border: 0.5px solid #3a2e22;
+    color: #8a7a6a;
+    padding: 0.6rem 1.5rem;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 0.5rem;
+    text-transform: lowercase;
+  }
+  .btn-next:hover { border-color: #c07a45; color: #e4d8c8; }
+
+  /* ===== S2 MICRODECISIONES ===== */
+  #s2 {
+    flex-direction: row;
+    align-items: center;
+    gap: 3rem;
+    padding: 4rem 2rem 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  @media (max-width: 500px) { #s2 { flex-direction: column; gap: 1.5rem; } }
+
+  .vasija-canvas { flex-shrink: 0; width: 140px; }
+  .vasija-svg { width: 100%; }
+  .vasija-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: #3a2e22;
+    text-align: center;
+    margin-top: 0.5rem;
+    letter-spacing: 0.1em;
+  }
+
+  .decision-panel { flex: 1; min-width: 220px; max-width: 260px; }
+  .d-step {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: #c07a45;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.15em;
+  }
+  .d-question {
+    font-size: 1.05rem;
+    font-style: italic;
+    color: #e4d8c8;
+    margin-bottom: 1.2rem;
+    line-height: 1.45;
+  }
+  .d-interact { margin-bottom: 1rem; }
+
+  .slider-wrap { position: relative; }
+  .slider-wrap input[type=range] {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #2a2218;
+    height: 1px;
+    border-radius: 0;
+    outline: none;
+  }
+  .slider-wrap input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #c07a45;
+    cursor: pointer;
+  }
+  .slider-wrap input[type=range]::-moz-range-thumb {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #c07a45;
+    cursor: pointer;
+    border: none;
+  }
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    color: #4a3a2a;
+    margin-top: 0.4rem;
+  }
+
+  .color-chips { display: flex; gap: 0.75rem; }
+  .chip {
+    width: 32px; height: 32px;
+    border: 0.5px solid #3a2e22;
+    cursor: pointer;
+    transition: transform 0.2s;
+    position: relative;
+  }
+  .chip:hover { transform: scale(1.1); }
+  .chip.selected::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border: 0.5px solid #c07a45;
+  }
+  .chip-terracota { background: #8B4513; }
+  .chip-ocre      { background: #C8A96E; }
+  .chip-ceniza    { background: #7A7570; }
+
+  .symbols { display: flex; gap: 0.75rem; }
+  .sym-btn {
+    width: 44px; height: 44px;
+    border: 0.5px solid #3a2e22;
+    background: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .sym-btn:hover { border-color: #c07a45; }
+  .sym-btn.selected { border-color: #c07a45; }
+  .sym-fill {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(192,122,69,0.15);
+    transition: height 1s linear;
+    height: 0%;
+  }
+
+  .hold-btn {
+    background: none;
+    border: 0.5px solid #3a2e22;
+    color: #8a7a6a;
+    padding: 0.5rem 1.2rem;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.05em;
+    user-select: none;
+    -webkit-user-select: none;
+    width: 100%;
+    text-align: center;
+  }
+  .hold-fill {
+    position: absolute;
+    inset: 0;
+    background: rgba(192,122,69,0.2);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.8s linear;
+  }
+  .hold-btn.holding .hold-fill { transform: scaleX(1); }
+
+  .d-hint { font-size: 0.7rem; color: #4a3a2a; font-style: italic; margin-top: 0.5rem; }
+
+  /* ===== EMERGENTE ===== */
+  .emergente {
+    position: absolute;
+    inset: 0;
+    background: rgba(12,9,6,0.93);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+  .emergente.visible { opacity: 1; pointer-events: all; }
+  .em-text {
+    font-size: 1.05rem;
+    font-style: italic;
+    color: #c07a45;
+    text-align: center;
+    max-width: 360px;
+    line-height: 1.65;
+    margin-bottom: 1rem;
+  }
+  .em-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: #3a2e22;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+  /* ===== S3 VASIJA FINAL ===== */
+  .s3-vessel { margin-bottom: 1.5rem; }
+  .s3-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: #c07a45;
+    letter-spacing: 0.15em;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+  .s3-phrase {
+    font-size: 1rem;
+    font-style: italic;
+    color: #8a7a6a;
+    text-align: center;
+    max-width: 380px;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+  }
+
+  /* ===== S5 REFLEXIÓN (nuevo) ===== */
+  #s5 { justify-content: flex-start; padding-top: 5rem; overflow-y: auto; }
+  .s5-wrap {
+    max-width: 480px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 3rem;
+  }
+  .s5-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: #c07a45;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  /* Elementos con reveal progresivo */
+  .s5-vessel, .s5-nombre, .s5-titulo, .s5-p, .s5-sep, .s5-cierre, .s5-btn-wrap {
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+  .s5-vessel  { margin-bottom: 1rem; }
+  .s5-nombre {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: #3a2e22;
+    letter-spacing: 0.12em;
+    margin-bottom: 2rem;
+    text-align: center;
+    transition-duration: 0.8s;
+  }
+  .s5-reflexion {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  .s5-titulo {
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: #e4d8c8;
+    text-align: center;
+    font-style: italic;
+  }
+  .s5-p {
+    font-size: 0.92rem;
+    color: #8a7a6a;
+    line-height: 1.8;
+    text-align: center;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+  .s5-sep {
+    width: 1px;
+    height: 1.5rem;
+    background: #2a2218;
+    margin: 0 auto;
+    transition-duration: 0.6s;
+  }
+  .s5-cierre {
+    font-size: 1rem;
+    font-style: italic;
+    color: #c07a45;
+    text-align: center;
+    max-width: 380px;
+    margin: 0.5rem auto 0;
+    line-height: 1.65;
+  }
+  .s5-btn-wrap { transition-duration: 0.8s; }
+  .revealed { opacity: 1 !important; }
+
+  /* ===== S4 INVITACIÓN ===== */
+  .invite-box {
+    border: 0.5px solid #2a2218;
+    padding: 1.5rem 2rem;
+    max-width: 420px;
+    width: 100%;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  .invite-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: #5a4a3a;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .invite-date { font-size: 1.8rem; font-weight: 400; color: #e4d8c8; margin-bottom: 0.25rem; }
+  .invite-place { font-size: 0.9rem; color: #8a7a6a; font-style: italic; }
+  .invite-cta {
+    font-size: 0.85rem;
+    color: #8a7a6a;
+    line-height: 1.6;
+    max-width: 380px;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .email-row { display: flex; gap: 0; max-width: 380px; width: 100%; }
+  .email-row input {
+    flex: 1;
+    background: none;
+    border: 0.5px solid #2a2218;
+    border-right: none;
+    color: #e4d8c8;
+    padding: 0.6rem 1rem;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.9rem;
+    outline: none;
+  }
+  .email-row input::placeholder { color: #3a2e22; }
+  .email-row input:focus { border-color: #c07a45; }
+  .email-row button {
+    background: none;
+    border: 0.5px solid #2a2218;
+    color: #8a7a6a;
+    padding: 0.6rem 1.2rem;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.3s;
+  }
+  .email-row button:hover { border-color: #c07a45; color: #e4d8c8; }
+  .confirmed {
+    font-size: 0.85rem;
+    color: #5a8a6a;
+    font-style: italic;
+    margin-top: 0.75rem;
+    display: none;
+  }
+</style>
+</head>
+<body>
+<div id="proto">
+  <div class="tex"></div>
+
+  <div class="nav-bar" id="navbar" style="display:none;">
+    <span class="nav-logo">El Umbral</span>
+    <span class="nav-progress" id="nav-prog"><span>00</span> / 05</span>
+  </div>
+
+  <div class="emergente" id="emergente">
+    <p class="em-text" id="em-text"></p>
+    <div class="em-dot"></div>
+  </div>
+
+  <!-- S0: ENTRADA -->
+  <div class="screen active" id="s0">
+    <div class="s0-phrase">
+      "Vivimos en una cultura donde <em>todo se deshace</em>.<br>Este proyecto existe para lo contrario."
+    </div>
+    <button class="btn-enter" onclick="goTo(1)">comenzar a construir</button>
+  </div>
+
+  <!-- S1: PROYECTO -->
+  <div class="screen" id="s1">
+    <div class="s1-block">
+      <p class="s1-tag">El origen</p>
+      <h2 class="s1-title">El barro no regresa</h2>
+      <p class="s1-body">En Jeremías 18, un alfarero trabaja en su torno. La vasija se deforma. En lugar de descartarla, vuelve a comenzar con el mismo barro. Lo que había roto se convierte en material para algo nuevo.</p>
+    </div>
+    <div class="s1-divider"></div>
+    <div class="s1-block">
+      <p class="s1-tag">La raíz</p>
+      <h2 class="s1-title">Los Tayrona lo sabían</h2>
+      <p class="s1-body">La civilización Tayrona inscribió en sus vasijas una cosmología completa. Espirales, líneas quebradas, círculos vacíos. Cada marca era una decisión irreversible sobre el barro húmedo.</p>
+    </div>
+    <div class="s1-divider"></div>
+    <div class="s1-block">
+      <p class="s1-tag">La pregunta</p>
+      <h2 class="s1-title">¿Qué ha olvidado tu cuerpo?</h2>
+      <p class="s1-body">Esta instalación es una experiencia donde la irreversibilidad del barro confronta la docilidad que el cuerpo ha olvidado. Vas a construir algo. No podrás deshacerlo.</p>
+    </div>
+    <div class="s1-divider"></div>
+    <button class="btn-next" onclick="goTo(2)">construir mi vasija →</button>
+  </div>
+
+  <!-- S2: MICRODECISIONES -->
+  <div class="screen" id="s2">
+    <div class="vasija-canvas">
+      <svg class="vasija-svg" id="vasija-svg" viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path id="v-path" d="" fill="#6B3A1F" stroke="none"/>
+        <path id="v-tex" d="" stroke="#3a2218" stroke-width="0.5" fill="none" opacity="0"/>
+        <text id="v-sym" x="60" y="95" text-anchor="middle" font-size="18" fill="rgba(255,255,255,0.15)"></text>
+      </svg>
+      <p class="vasija-label" id="v-label">forma / — / — / —</p>
+    </div>
+
+    <div class="decision-panel">
+      <!-- Gesto 1: Forma -->
+      <div id="d1" class="d-interact">
+        <p class="d-step">gesto 1 / 4</p>
+        <p class="d-question">"¿Cómo busca tu cuerpo su centro?"</p>
+        <div class="slider-wrap">
+          <input type="range" min="0" max="100" value="50" id="slider-forma"
+            oninput="updateForma(this.value)"
+            onchange="commitForma(this.value)">
+          <div class="slider-labels"><span>expansión</span><span>contención</span></div>
+        </div>
+        <p class="d-hint">suelta el deslizador para continuar</p>
+      </div>
+
+      <!-- Gesto 2: Textura -->
+      <div id="d2" class="d-interact" style="display:none;">
+        <p class="d-step">gesto 2 / 4</p>
+        <p class="d-question">"¿Qué huella deja el camino en tu piel?"</p>
+        <button class="hold-btn" id="hold-tex"
+          onmousedown="startHold()" onmouseup="endHold()"
+          ontouchstart="startHold()" ontouchend="endHold()">
+          <div class="hold-fill" id="hold-fill-tex"></div>
+          <span style="position:relative;z-index:1;">mantener → rugosa &nbsp;/&nbsp; soltar → lisa</span>
+        </button>
+        <p class="d-hint">la presión decide la textura</p>
+      </div>
+
+      <!-- Gesto 3: Color -->
+      <div id="d3" class="d-interact" style="display:none;">
+        <p class="d-step">gesto 3 / 4</p>
+        <p class="d-question">"¿Qué arcilla te convoca?"</p>
+        <div class="color-chips">
+          <div class="chip chip-terracota" onclick="selectColor(this,'terracota','#8B4513')" title="terracota"></div>
+          <div class="chip chip-ocre"      onclick="selectColor(this,'ocre','#C8A96E')"      title="ocre"></div>
+          <div class="chip chip-ceniza"    onclick="selectColor(this,'ceniza','#7A7570')"    title="ceniza"></div>
+        </div>
+      </div>
+
+      <!-- Gesto 4: Símbolo -->
+      <div id="d4" class="d-interact" style="display:none;">
+        <p class="d-step">gesto 4 / 4</p>
+        <p class="d-question">"¿Qué escritura grabas para el futuro?"</p>
+        <div class="symbols">
+          <button class="sym-btn" id="sym-espiral"
+            onmousedown="startSym('espiral','⊙')" onmouseup="endSym('espiral')"
+            ontouchstart="startSym('espiral','⊙')" ontouchend="endSym('espiral')">
+            <div class="sym-fill" id="sf-espiral"></div>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#8a7a6a" stroke-width="1">
+              <circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="4"/>
+              <circle cx="10" cy="10" r="1.5" fill="#8a7a6a"/>
+            </svg>
+          </button>
+          <button class="sym-btn" id="sym-linea"
+            onmousedown="startSym('linea','⋀')" onmouseup="endSym('linea')"
+            ontouchstart="startSym('linea','⋀')" ontouchend="endSym('linea')">
+            <div class="sym-fill" id="sf-linea"></div>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#8a7a6a" stroke-width="1.2">
+              <polyline points="2,16 10,4 18,16"/>
+            </svg>
+          </button>
+          <button class="sym-btn" id="sym-circulo"
+            onmousedown="startSym('circulo','○')" onmouseup="endSym('circulo')"
+            ontouchstart="startSym('circulo','○')" ontouchend="endSym('circulo')">
+            <div class="sym-fill" id="sf-circulo"></div>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#8a7a6a" stroke-width="1.2">
+              <circle cx="10" cy="10" r="7"/>
+            </svg>
+          </button>
+        </div>
+        <p class="d-hint">mantén presionado 1 segundo</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- S3: VASIJA FINAL -->
+  <div class="screen" id="s3">
+    <svg class="s3-vessel" id="vasija-final" width="100" height="130" viewBox="0 0 120 160" fill="none">
+      <path id="vf-path" d="" fill="#8B4513"/>
+      <text id="vf-sym" x="60" y="95" text-anchor="middle" font-size="22" fill="rgba(255,255,255,0.2)"></text>
+    </svg>
+    <p class="s3-name" id="vasija-nombre"></p>
+    <p class="s3-phrase">"Esta forma solo existe aquí.<br>Lo que ocurra con el barro en la instalación es irrepetible."</p>
+    <button class="btn-next" onclick="goTo(5)">escuchar lo que dice →</button>
+  </div>
+
+  <!-- S5: REFLEXIÓN PERSONALIZADA -->
+  <div class="screen" id="s5">
+    <div class="s5-wrap">
+      <p class="s5-label">lo que tu vasija reveló</p>
+
+      <svg class="s5-vessel" id="s5-vessel" width="80" height="105" viewBox="0 0 120 160" fill="none">
+        <path id="s5v-path" d="" fill="#8B4513"/>
+        <text id="s5v-sym" x="60" y="95" text-anchor="middle" font-size="22" fill="rgba(255,255,255,0.2)"></text>
+      </svg>
+
+      <p class="s5-nombre" id="s5-nombre"></p>
+
+      <div class="s5-reflexion">
+        <p class="s5-titulo" id="s5-titulo"></p>
+        <p class="s5-p"     id="s5-p1"></p>
+        <div class="s5-sep" id="s5-sep1"></div>
+        <p class="s5-p"     id="s5-p2"></p>
+        <p class="s5-p"     id="s5-p3"></p>
+        <div class="s5-sep" id="s5-sep2"></div>
+        <p class="s5-p"     id="s5-p4"></p>
+        <div class="s5-sep" id="s5-sep3"></div>
+        <p class="s5-cierre" id="s5-cierre"></p>
+      </div>
+
+      <div class="s5-btn-wrap" id="s5-btn-wrap">
+        <button class="btn-next" onclick="goTo(4)">continuar hacia la instalación →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- S4: INVITACIÓN -->
+  <div class="screen" id="s4">
+    <div class="invite-box">
+      <p class="invite-label">La instalación</p>
+      <p class="invite-date">Junio 2025</p>
+      <p class="invite-place">Universidad / Medellín, Colombia</p>
+    </div>
+    <p class="invite-cta">El barro estará ahí. El espacio estará ahí.<br>La experiencia no se repite.</p>
+    <div class="email-row">
+      <input type="email" placeholder="tu correo" id="email-input">
+      <button onclick="confirmEmail()">quiero ir</button>
+    </div>
+    <p class="confirmed" id="confirmed-msg">Recibirás la información de acceso. El barro te espera.</p>
+  </div>
+</div>
+
+<script>
+  var state = {
+    forma: 50,
+    textura: 'lisa',
+    color: '#8B4513',
+    colorName: 'terracota',
+    simbolo: '—',
+    simboloName: '—'
+  };
+  var holdTimer = null;
+  var symTimer  = null;
+  var formaCommitted   = false;
+  var texturaCommitted = false;
+  var colorCommitted   = false;
+
+  var EMERGENTES = {
+    forma:   "La montaña y el valle no son opuestos: son el mismo aliento. Tu vasija ahora tiene un linaje.",
+    textura: "Lo liso recuerda el agua que pulió los cantos. Lo rugoso guarda la memoria de la piedra.",
+    color:   "Cada arcilla viene de un lugar del río. El fuego la transforma. Tu color es un territorio quemado.",
+    simbolo: "La espiral es el tiempo que no termina. La línea quebrada, el filo de la montaña. El círculo vacío, el hueco donde germina el maíz."
+  };
+
+  var REFLEXIONES = {
+    forma: {
+      expansiva: {
+        titulo: "La apertura como acto",
+        cuerpo: "Tu vasija se despliega hacia lo que no puede controlarse. Hay una generosidad radical en esa forma: elegiste ocupar el espacio que muchos aprenden a evitar."
+      },
+      intermedia: {
+        titulo: "El umbral como territorio",
+        cuerpo: "Elegiste el punto donde la contención y la apertura se negocian. No es indecisión: es la inteligencia del umbral, el único lugar donde las transformaciones son posibles."
+      },
+      contenida: {
+        titulo: "La fuerza de lo que guarda",
+        cuerpo: "La altura de tu vasija habla de alguien que ha aprendido a guardar. La contención no es miedo: es la disciplina de quien sabe que no todo lo valioso necesita ser visto."
+      }
+    },
+    textura: {
+      rugosa: "Las marcas que lleva tu vasija no son accidente: son memoria inscrita en la superficie. Tu cuerpo guarda lo que la mente intenta archivar.",
+      lisa:   "La superficie que elegiste no es ausencia de historia, sino su resultado. Algo en ti ha sido pulido por el paso de las cosas, no por olvido, sino por una forma de aceptación."
+    },
+    color: {
+      terracota: "El terracota que escogiste viene del fuego. Es la arcilla que ha pasado por la quema y sigue siendo, transformada por lo que casi la destruyó.",
+      ocre:      "El ocre es la tierra cuando el sol la ha tocado durante siglos. Elegiste la paciencia que no se anuncia a sí misma.",
+      ceniza:    "La ceniza es el color de lo que sobrevive a su propia destrucción. Hay una sabiduría quieta en ese tono: la de quien ya ha visto arder lo que creía permanente."
+    },
+    simbolo: {
+      espiral: "La espiral que grabaste es el símbolo del tiempo que no termina en un punto, sino que regresa sobre sí mismo, más amplio cada vez.",
+      linea:   "La línea quebrada que inscribiste es el mapa de quien encontró su verdadera dirección precisamente en las curvas, no a pesar de ellas.",
+      circulo: "El círculo vacío que grabaste es la pregunta que ya no necesita respuesta: el hueco donde germina lo que todavía no tiene nombre."
+    },
+    cierre: {
+      "expansiva+espiral": "Eres el tiempo que se expande para regresar a sí mismo.",
+      "expansiva+linea":   "Eres la apertura que cada quiebre del camino hizo posible.",
+      "expansiva+circulo": "Eres el espacio abierto que espera ser habitado por lo desconocido.",
+      "intermedia+espiral":"Habitas el umbral donde el tiempo hace su trabajo más silencioso.",
+      "intermedia+linea":  "Tu equilibrio es el producto exacto de cada curva que elegiste no evitar.",
+      "intermedia+circulo":"El punto medio que elegiste es también el vacío más fértil.",
+      "contenida+espiral": "Tu contención es una espiral hacia adentro: no hay lugar más vasto.",
+      "contenida+linea":   "Cada quiebre del camino te hizo más vertical, más tuyo.",
+      "contenida+circulo": "Guardas un círculo vacío que nadie más puede ver. Eso lo hace sagrado."
+    }
+  };
+
+  var PROGRESS_MAP = { 1: '01', 2: '02', 3: '03', 5: '04', 4: '05' };
+
+  function goTo(n) {
+    document.querySelector('.screen.active').classList.remove('active');
+    document.getElementById('s' + n).classList.add('active');
+    var nb   = document.getElementById('navbar');
+    var prog = document.getElementById('nav-prog');
+    if (n === 0) {
+      nb.style.display = 'none';
+    } else {
+      nb.style.display = 'flex';
+      prog.innerHTML = '<span>' + (PROGRESS_MAP[n] || '0' + n) + '</span> / 05';
+    }
+    if (n === 3) renderFinal();
+    if (n === 5) renderReflexion();
+  }
+
+  function getVasijaPath(forma) {
+    var f = parseInt(forma);
+    var wide = f < 33 ? 55 : (f > 66 ? 35 : 45);
+    var tall = f < 33 ? 130 : (f > 66 ? 150 : 140);
+    var top = (160 - tall) / 2;
+    var bot = top + tall;
+    var cx  = 60;
+    return [
+      'M' + (cx-15) + ',' + top,
+      'Q' + (cx-wide) + ',' + (top + tall*0.35) + ' ' + (cx-wide+5) + ',' + (top + tall*0.65),
+      'Q' + (cx-10)   + ',' + bot + ' ' + cx + ',' + bot,
+      'Q' + (cx+10)   + ',' + bot + ' ' + (cx+wide-5) + ',' + (top + tall*0.65),
+      'Q' + (cx+wide) + ',' + (top + tall*0.35) + ' ' + (cx+15) + ',' + top,
+      'Z'
+    ].join(' ');
+  }
+
+  function updateForma(v) {
+    document.getElementById('v-path').setAttribute('d', getVasijaPath(v));
+  }
+
+  function commitForma(v) {
+    if (formaCommitted) return;
+    formaCommitted = true;
+    state.forma = v;
+    showEmergente('forma', function() {
+      document.getElementById('d1').style.display = 'none';
+      document.getElementById('d2').style.display = 'block';
+    });
+  }
+
+  function startHold() {
+    if (texturaCommitted) return;
+    var btn = document.getElementById('hold-tex');
+    btn.classList.add('holding');
+    holdTimer = setTimeout(function() {
+      state.textura = 'rugosa';
+      texturaCommitted = true;
+      btn.classList.remove('holding');
+      commitTextura();
+    }, 800);
+  }
+
+  function endHold() {
+    clearTimeout(holdTimer);
+    document.getElementById('hold-tex').classList.remove('holding');
+    if (!texturaCommitted) {
+      state.textura = 'lisa';
+      texturaCommitted = true;
+      commitTextura();
+    }
+  }
+
+  function commitTextura() {
+    showEmergente('textura', function() {
+      document.getElementById('d2').style.display = 'none';
+      document.getElementById('d3').style.display = 'block';
+    });
+  }
+
+  function selectColor(el, name, hex) {
+    if (colorCommitted) return;
+    colorCommitted = true;
+    state.color = hex;
+    state.colorName = name;
+    document.querySelectorAll('.chip').forEach(function(c) { c.classList.remove('selected'); });
+    el.classList.add('selected');
+    document.getElementById('v-path').setAttribute('fill', hex);
+    setTimeout(function() {
+      showEmergente('color', function() {
+        document.getElementById('d3').style.display = 'none';
+        document.getElementById('d4').style.display = 'block';
+      });
+    }, 300);
+  }
+
+  function startSym(name, char) {
+    var fill = document.getElementById('sf-' + name);
+    fill.style.height = '100%';
+    symTimer = setTimeout(function() {
+      state.simbolo     = char;
+      state.simboloName = name;
+      document.getElementById('v-sym').textContent = char;
+      document.querySelectorAll('.sym-btn').forEach(function(b) { b.classList.remove('selected'); });
+      document.getElementById('sym-' + name).classList.add('selected');
+      showEmergente('simbolo', function() { goTo(3); });
+    }, 1000);
+  }
+
+  function endSym(name) {
+    clearTimeout(symTimer);
+    document.getElementById('sf-' + name).style.height = '0%';
+  }
+
+  function showEmergente(type, cb) {
+    var em = document.getElementById('emergente');
+    document.getElementById('em-text').textContent = EMERGENTES[type];
+    em.classList.add('visible');
+    setTimeout(function() {
+      em.classList.remove('visible');
+      setTimeout(cb, 400);
+    }, 3000);
+  }
+
+  function renderFinal() {
+    var path = getVasijaPath(state.forma);
+    document.getElementById('vf-path').setAttribute('d', path);
+    document.getElementById('vf-path').setAttribute('fill', state.color);
+    document.getElementById('vf-sym').textContent = state.simbolo !== '—' ? state.simbolo : '';
+    var fk     = formaKey();
+    var nombre = 'vasija ' + fk + ' / ' + state.textura + ' / ' + state.colorName;
+    if (state.simboloName !== '—') nombre += ' / ' + state.simboloName;
+    document.getElementById('vasija-nombre').textContent = nombre.toUpperCase();
+  }
+
+  function formaKey() {
+    var f = parseInt(state.forma);
+    return f < 33 ? 'expansiva' : (f > 66 ? 'contenida' : 'intermedia');
+  }
+
+  function renderReflexion() {
+    var fk      = formaKey();
+    var texKey  = state.textura;
+    var colKey  = state.colorName;
+    var symKey  = state.simboloName !== '—' ? state.simboloName : 'circulo';
+    var cKey    = fk + '+' + symKey;
+    var r       = REFLEXIONES;
+
+    /* vasija miniatura */
+    var path = getVasijaPath(state.forma);
+    document.getElementById('s5v-path').setAttribute('d', path);
+    document.getElementById('s5v-path').setAttribute('fill', state.color);
+    document.getElementById('s5v-sym').textContent = state.simbolo !== '—' ? state.simbolo : '';
+
+    /* nombre */
+    var nombre = 'vasija ' + fk + ' / ' + texKey + ' / ' + colKey;
+    if (state.simboloName !== '—') nombre += ' / ' + state.simboloName;
+    document.getElementById('s5-nombre').textContent = nombre.toUpperCase();
+
+    /* textos */
+    document.getElementById('s5-titulo').textContent = r.forma[fk].titulo;
+    document.getElementById('s5-p1').textContent     = r.forma[fk].cuerpo;
+    document.getElementById('s5-p2').textContent     = r.textura[texKey];
+    document.getElementById('s5-p3').textContent     = r.color[colKey];
+    document.getElementById('s5-p4').textContent     = r.simbolo[symKey];
+    document.getElementById('s5-cierre').textContent = r.cierre[cKey] || '';
+
+    /* reset opacity */
+    var ids = ['s5-vessel','s5-nombre','s5-titulo','s5-p1','s5-sep1',
+               's5-p2','s5-p3','s5-sep2','s5-p4','s5-sep3','s5-cierre','s5-btn-wrap'];
+    ids.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.classList.remove('revealed');
+    });
+
+    /* reveal escalonado */
+    var delays = [400, 900, 1600, 2300, 3000, 3600, 4200, 4800, 5400, 6000, 6600, 7800];
+    ids.forEach(function(id, i) {
+      setTimeout(function() {
+        var el = document.getElementById(id);
+        if (el) el.classList.add('revealed');
+      }, delays[i]);
+    });
+  }
+
+  function confirmEmail() {
+    var email = document.getElementById('email-input').value;
+    if (email && email.indexOf('@') > 0) {
+      document.getElementById('email-input').style.display = 'none';
+      document.querySelector('.email-row button').style.display = 'none';
+      document.getElementById('confirmed-msg').style.display = 'block';
+    }
+  }
+
+  updateForma(50);
+</script>
+</body>
+</html>
