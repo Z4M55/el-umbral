@@ -465,11 +465,13 @@ html, body { background: #0c0906; height: 100%; }
   ══════════════════════════════════════ -->
   <div class="screen active" id="m1">
     <div class="momento-wrap" id="m1-wrap">
-      <p class="fragment"       id="m1-f0">Antes del lenguaje, hubo manos.</p>
-      <p class="fragment"       id="m1-f1">Antes de la escritura, hubo barro.</p>
-      <p class="fragment key"   id="m1-f2">El alfarero ancestral de esta sierra no fabricaba vasijas.</p>
-      <p class="fragment"       id="m1-f3">Escuchaba a la tierra y la dejaba tomar forma.</p>
-      <p class="fragment acento" id="m1-f4">Cada pieza era un cuerpo. Cada cuerpo, una oración sin palabras.</p>
+      <p class="fragment"        id="m1-f0">Antes de la escritura, el conocimiento se guardaba en las manos.</p>
+      <p class="fragment"        id="m1-f1">El alfarero de esta sierra no fabricaba vasijas.</p>
+      <p class="fragment key"    id="m1-f2">Escuchaba el barro.</p>
+      <p class="fragment"        id="m1-f3">Adaptaba su cuerpo al ritmo del material hasta que ambos respiraban igual.</p>
+      <p class="fragment"        id="m1-f4">A esto los antiguos lo llamaban <em style="color:#c07a45;font-style:normal;">sentipensar</em>:</p>
+      <p class="fragment acento" id="m1-f5">sentir, pensar y hacer ocurriendo en el mismo gesto.</p>
+      <p class="fragment key"    id="m1-f6">No era arte. Era una forma de estar presente.</p>
     </div>
     <p class="hint-touch" id="m1-hint">· toca para continuar ·</p>
   </div>
@@ -480,11 +482,14 @@ html, body { background: #0c0906; height: 100%; }
   ══════════════════════════════════════ -->
   <div class="screen" id="m2">
     <div class="momento-wrap" id="m2-wrap">
-      <p class="fragment key"   id="m2-f0">Tu cuerpo está aquí.</p>
-      <p class="fragment acento" id="m2-f1">¿Y tú?</p>
-      <p class="fragment"       id="m2-f2">Vivimos divididos: el cuerpo en un lugar, la mente en otro, el espíritu en pausa.</p>
-      <p class="fragment"       id="m2-f3">Hemos olvidado que somos un solo gesto.</p>
-      <p class="fragment acento" id="m2-f4">El barro no es material. Es una tecnología antigua para volver a habitarse.</p>
+      <p class="fragment key"    id="m2-f0">Tu cuerpo lleva una memoria que tu mente no recuerda.</p>
+      <p class="fragment"        id="m2-f1">Está en las células, anterior al lenguaje.</p>
+      <p class="fragment"        id="m2-f2">Pero vivimos divididos:</p>
+      <p class="fragment"        id="m2-f3">el cuerpo opera, la mente piensa en otra parte, el espíritu espera.</p>
+      <p class="fragment acento" id="m2-f4">Tres habitantes que ya no se hablan.</p>
+      <p class="fragment"        id="m2-f5">El barro fue, durante milenios, el lugar donde volvían a encontrarse.</p>
+      <p class="fragment"        id="m2-f6">No porque el barro tenga magia.</p>
+      <p class="fragment key"    id="m2-f7">Porque exige presencia, y la presencia es lo único que reúne lo que estamos.</p>
     </div>
     <div class="hold-wrap" id="m2-hold-wrap">
       <button class="hold-btn" id="m2-hold-btn"
@@ -496,7 +501,7 @@ html, body { background: #0c0906; height: 100%; }
       <div class="hold-progress" id="m2-progress">
         <div class="hold-progress-fill" id="m2-progress-fill"></div>
       </div>
-      <p class="hold-hint">sostén 4 segundos · la presencia sostiene la lectura</p>
+      <p class="hold-hint">sostén 5 segundos · la presencia sostiene la lectura</p>
     </div>
   </div>
 
@@ -506,12 +511,15 @@ html, body { background: #0c0906; height: 100%; }
   ══════════════════════════════════════ -->
   <div class="screen" id="m3">
     <div class="momento-wrap">
-      <p class="fragment"       id="m3-f0">No vienes a aprender.</p>
-      <p class="fragment"       id="m3-f1">No vienes a entender.</p>
-      <p class="fragment key"   id="m3-f2">Vienes a recordar algo que tu cuerpo sabe y ha callado.</p>
-      <p class="fragment acento" id="m3-f3">¿Qué ha olvidado tu cuerpo?</p>
-      <p class="fragment"       id="m3-f4">No respondas ahora.</p>
-      <p class="fragment acento" id="m3-f5">Cruza el umbral.</p>
+      <p class="fragment"        id="m3-f0">Lo que sigue no es una exposición.</p>
+      <p class="fragment key"    id="m3-f1">Es un taller.</p>
+      <p class="fragment"        id="m3-f2">Cada vasija que vas a tocar fue, alguna vez, el espejo de alguien.</p>
+      <p class="fragment"        id="m3-f3">Un instante de su vida, hecho cuerpo.</p>
+      <p class="fragment key"    id="m3-f4">Ahora te toca a ti.</p>
+      <p class="fragment"        id="m3-f5">No para crear algo.</p>
+      <p class="fragment"        id="m3-f6">Para recordar algo.</p>
+      <p class="fragment acento" id="m3-f7">¿Qué ha olvidado tu cuerpo?</p>
+      <p class="fragment acento" id="m3-f8">Cruza.</p>
     </div>
   </div>
 
@@ -717,8 +725,8 @@ function revealFragments(ids, intervalMs, onAllDone) {
 
 (function initM1() {
   revealFragments(
-    ['m1-f0','m1-f1','m1-f2','m1-f3','m1-f4'],
-    2000,
+    ['m1-f0','m1-f1','m1-f2','m1-f3','m1-f4','m1-f5','m1-f6'],
+    2200,
     function() {
       document.getElementById('m1-hint').classList.add('visible');
       document.getElementById('m1').addEventListener('click', m1Advance, { once: true });
@@ -736,8 +744,8 @@ function m1Advance() {
    MOMENTO 2 — hold 4s revela fragmentos
 ════════════════════════════════════════ */
 var m2 = { revealed: 0, interval: null, complete: false };
-var M2_FRAGS = ['m2-f0','m2-f1','m2-f2','m2-f3','m2-f4'];
-var M2_STEP  = 800; // ms por fragmento (5 × 800 = 4 000 ms)
+var M2_FRAGS = ['m2-f0','m2-f1','m2-f2','m2-f3','m2-f4','m2-f5','m2-f6','m2-f7'];
+var M2_STEP  = 625; // ms por fragmento (8 × 625 = 5 000 ms)
 
 function initM2() {
   m2.revealed = 0; m2.complete = false;
@@ -783,13 +791,13 @@ function m2HoldEnd() {
 ════════════════════════════════════════ */
 function initM3() {
   revealFragments(
-    ['m3-f0','m3-f1','m3-f2','m3-f3','m3-f4','m3-f5'],
-    1800,
+    ['m3-f0','m3-f1','m3-f2','m3-f3','m3-f4','m3-f5','m3-f6','m3-f7','m3-f8'],
+    1600,
     function() {
-      // pausa 6s en el último fragmento, luego 8s de silencio
+      // pausa 8s sobre la pregunta final, luego 10s de silencio-compuerta
       setTimeout(function() {
-        silence(8000, function() { goTo('s2'); });
-      }, 6000);
+        silence(10000, function() { goTo('s2'); });
+      }, 8000);
     }
   );
 }
