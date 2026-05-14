@@ -9,18 +9,16 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Ocultar el chrome de Streamlit para experiencia inmersiva
+# Eliminar todo el chrome de Streamlit — experiencia inmersiva
 st.markdown("""
 <style>
   #MainMenu, header, footer { visibility: hidden; }
   [data-testid="stAppViewContainer"] { background: #0c0906; padding: 0; }
   [data-testid="stVerticalBlock"]    { gap: 0 !important; padding: 0 !important; }
   .block-container { padding: 0 !important; max-width: 100% !important; }
-  iframe { display: block; }
+  iframe { display: block; border: none; }
 </style>
 """, unsafe_allow_html=True)
 
-html_path = Path(__file__).parent / "umbral_web.html"
-html_content = html_path.read_text(encoding="utf-8")
-
-components.html(html_content, height=740, scrolling=False)
+html_content = (Path(__file__).parent / "umbral_web.html").read_text(encoding="utf-8")
+components.html(html_content, height=750, scrolling=False)
